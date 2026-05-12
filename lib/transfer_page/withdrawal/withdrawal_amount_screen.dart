@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '/models/bank_account_model.dart';
 import '/state/app_state.dart';
+import '/shared/thousands_formatter.dart';
 import 'withdrawal_review_screen.dart';
 
 class WithdrawalAmountScreen extends StatefulWidget {
@@ -28,7 +28,7 @@ class _WithdrawalAmountScreenState extends State<WithdrawalAmountScreen> {
 
   void _setQuickAmount(int amount) {
     setState(() {
-      _amountController.text = amount.toString();
+      _amountController.text = ThousandsSeparatorFormatter.format(amount);
       _errorText = null;
     });
   }
@@ -49,7 +49,7 @@ class _WithdrawalAmountScreenState extends State<WithdrawalAmountScreen> {
   }
 
   void _onLanjutkan() {
-    final raw = _amountController.text.trim();
+    final raw = _amountController.text.replaceAll('.', '').trim();
     final amount = double.tryParse(raw);
 
     if (amount == null || amount < 50000) {
@@ -74,7 +74,7 @@ class _WithdrawalAmountScreenState extends State<WithdrawalAmountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rawAmount = double.tryParse(_amountController.text) ?? 0;
+    final rawAmount = double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0;
     final total = rawAmount + _adminFee;
 
     return Scaffold(
@@ -163,7 +163,7 @@ class _WithdrawalAmountScreenState extends State<WithdrawalAmountScreen> {
                         child: TextField(
                           controller: _amountController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          inputFormatters: [ThousandsSeparatorFormatter()],
                           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                           decoration: const InputDecoration(
                             hintText: '0',

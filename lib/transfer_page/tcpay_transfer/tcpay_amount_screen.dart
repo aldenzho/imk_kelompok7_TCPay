@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '/models/tcpay_contact.dart';
 import '/state/app_state.dart';
+import '/shared/thousands_formatter.dart';
 import 'tcpay_review_screen.dart';
 
 class TcPayAmountScreen extends StatefulWidget {
@@ -29,7 +29,7 @@ class _TcPayAmountScreenState extends State<TcPayAmountScreen> {
 
   void _setQuickAmount(int amount) {
     setState(() {
-      _amountController.text = amount.toString();
+      _amountController.text = ThousandsSeparatorFormatter.format(amount);
       _errorText = null;
     });
   }
@@ -149,7 +149,7 @@ class _TcPayAmountScreenState extends State<TcPayAmountScreen> {
                         child: TextField(
                           controller: _amountController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          inputFormatters: [ThousandsSeparatorFormatter()],
                           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                           decoration: const InputDecoration(
                             hintText: '0',

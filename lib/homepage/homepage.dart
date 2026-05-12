@@ -6,6 +6,7 @@ import '/riwayat_page/riwayat_page.dart';
 import '/settings_page/settings_page.dart';
 import '/state/app_state.dart';
 import '/qris/qris_menu_screen.dart';
+import '/isi_saldo/isi_saldo_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -174,7 +175,10 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const IsiSaldoScreen()),
+                              ).then((_) => setState(() {})),
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
