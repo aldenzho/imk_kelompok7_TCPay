@@ -279,13 +279,19 @@ class _HomePageState extends State<HomePage> {
                       iconBgColor: const Color(0xFFA93802).withValues(alpha: 0.1),
                       iconColor: const Color(0xFFA93802),
                     ),
-                    _buildMenuCard(
-                      icon: Icons.school,
-                      label: 'Campus Pay',
-                      subtitle: 'BAYA & ACARA',
-                      bgColor: const Color(0xFFFFDCBD),
-                      iconBgColor: Colors.white,
-                      iconColor: const Color(0xFF8A5100),
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TransferPage()),
+                      ).then((_) => setState(() {})),
+                      child: _buildMenuCard(
+                        icon: Icons.school,
+                        label: 'Campus Pay',
+                        subtitle: 'BAYA & ACARA',
+                        bgColor: const Color(0xFFFFDCBD),
+                        iconBgColor: Colors.white,
+                        iconColor: const Color(0xFF8A5100),
+                      ),
                     ),
                   ],
                 ),
