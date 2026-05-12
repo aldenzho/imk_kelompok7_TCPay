@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '/homepage/homepage.dart';
 import '/transfer_page/transfer_page.dart';
 import '/settings_page/settings_page.dart';
+import '/state/app_state.dart';
+import '/models/transaction_model.dart';
 
 class RiwayatPage extends StatefulWidget {
   const RiwayatPage({super.key});
@@ -14,8 +16,8 @@ class RiwayatPage extends StatefulWidget {
 
 class _RiwayatPageState extends State<RiwayatPage> {
   bool _isBalanceVisible = false;
-  final String _actualBalance = "Rp 12.400.000";
-  String get _displayBalance => _isBalanceVisible ? _actualBalance : "Rp •••••••";
+  String get _actualBalance => AppState.instance.formattedBalance;
+  String get _displayBalance => _isBalanceVisible ? _actualBalance : 'Rp •••••••';
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +71,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: Colors.grey.withValues(alpha: 0.2),
                   spreadRadius: 1,
                   blurRadius: 8,
                   offset: const Offset(0, 2),
@@ -169,7 +171,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
               color: const Color(0xFFFFFFFF),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2)),
+                BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2)),
               ],
             ),
             child: Column(
@@ -181,7 +183,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
                     const Text('Pengeluaran Bulanan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(color: Color(0xFFFFDCBD).withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(color: const Color(0xFFFFDCBD).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                       child: const Text('8% vs bulan lalu', style: TextStyle(fontSize: 10, color: Color(0xFF8A5100))),
                     ),
                   ],
@@ -229,7 +231,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
             ],
           ),
 
-          // Aktivitas
+          // Aktivitas — live dari AppState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -241,15 +243,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildActivityGroup('KEMARIN — 23 AGU', [
-            _buildActivityItem('Toko Universitas', 'Buku • 15:20', '-Rp 1.150.000', Icons.menu_book),
-            _buildActivityItem('Ojek Kampus ', 'Transportasi • 09:12', '-Rp 15.000', Icons.motorcycle),
-          ]),
-          const SizedBox(height: 16),
-          _buildActivityGroup('KEMARIN — 23 AGU', [
-            _buildActivityItem('Toko Universitas Buku', 'Buku • 15:20', '-Rp 1.150.000', Icons.menu_book),
-            _buildActivityItem('Ojek Kampus Tempatan', 'Transportasi • 09:12', '-Rp 15.000', Icons.motorcycle),
-          ]),
+          ...AppState.instance.transactions.map((tx) => _buildLiveTxItem(tx)),
           const SizedBox(height: 80),
         ],
       ),
@@ -261,7 +255,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'BERANDA'),
           BottomNavigationBarItem(icon: Icon(Icons.swap_horiz), label: 'TRANSFER'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'RIMAYAT'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'RIWAYAT'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'PENGATURAN'),
         ],
         currentIndex: 2,
@@ -278,24 +272,6 @@ class _RiwayatPageState extends State<RiwayatPage> {
     );
   }
 
-  Widget _buildBarChartItem(String day, double heightPercent) {
-    double maxHeight = 40;
-    double barHeight = (heightPercent / 100) * maxHeight;
-    return Column(
-      children: [
-        Container(
-          width: 20,
-          height: barHeight,
-          decoration: BoxDecoration(
-            color: const Color(0xFF0040A1),
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(day, style: const TextStyle(fontSize: 10)),
-      ],
-    );
-  }
   Widget _buildInfoCardVertical(String title, String value, IconData icon, Color iconColor) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -303,7 +279,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2)),
+          BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -312,7 +288,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: iconColor, size: 24),
@@ -326,49 +302,67 @@ class _RiwayatPageState extends State<RiwayatPage> {
     );
   }
 
-  Widget _buildActivityGroup(String date, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            date,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
-          ),
-        ),
-        ...items,
-      ],
-    );
-  }
+  Widget _buildLiveTxItem(TransactionModel tx) {
+    final IconData icon;
+    final Color iconBg;
+    switch (tx.type) {
+      case TransactionType.transferOut:
+        icon = Icons.arrow_upward;
+        iconBg = const Color(0xFFFFDCBD);
+      case TransactionType.transferIn:
+        icon = Icons.arrow_downward;
+        iconBg = const Color(0xFFDAE2FF);
+      case TransactionType.withdrawal:
+        icon = Icons.account_balance;
+        iconBg = const Color(0xFFEAE8E7);
+      case TransactionType.qrisPayment:
+        icon = Icons.qr_code;
+        iconBg = const Color(0xFFFFDCBD);
+    }
 
-  Widget _buildActivityItem(String title, String time, String amount, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(12),
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(icon, color: Colors.grey, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                const SizedBox(height: 2),
-                Text(time, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-              ],
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, color: Colors.black54, size: 22),
             ),
-          ),
-          Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(tx.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  const SizedBox(height: 2),
+                  Text(tx.subtitle, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                ],
+              ),
+            ),
+            Text(
+              tx.formattedAmount,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: tx.isDebit ? Colors.red : Colors.green,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,8 +2,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '/transfer_page/transfer_page.dart';
-import '/riwayat_page/riwayat_page.dart';  // sesuaikan path jika perlu
-import '/settings_page/settings_page.dart';  // sesuaikan path jika perlu
+import '/riwayat_page/riwayat_page.dart';
+import '/settings_page/settings_page.dart';
+import '/state/app_state.dart';
+import '/qris/qris_menu_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,8 +16,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _isBalanceVisible = false;
-  final String _actualBalance = "Rp 1.234.567";
-  String get _displayBalance => _isBalanceVisible ? _actualBalance : "Rp •••••••";
+
+  String get _actualBalance => AppState.instance.formattedBalance;
+  String get _displayBalance => _isBalanceVisible ? _actualBalance : 'Rp •••••••';
+
+  void _goToQris() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const QrisMenuScreen()),
+    ).then((_) => setState(() {}));
+  }
 
   Widget _buildQuickAccessGridItem(String title, IconData icon) {
     return Container(
@@ -41,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFBF9F8),
+      backgroundColor: const Color(0xFFFBF9F8),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Column(
@@ -70,7 +80,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: [
-          // Container biru full width
+          // Balance card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
@@ -84,7 +94,7 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Colors.grey.withValues(alpha: 0.2),
                     spreadRadius: 1,
                     blurRadius: 8,
                     offset: const Offset(0, 2),
@@ -95,7 +105,6 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Baris Akun Akademik Utama & AKTIF
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -106,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Text(
@@ -118,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Baris Saldo dengan efek blur SUPER KUAT saat disembunyikan
+                  // Balance row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -135,7 +144,10 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                       IconButton(
-                        icon: Icon(_isBalanceVisible ? Icons.visibility : Icons.visibility_off, color: Colors.white),
+                        icon: Icon(
+                          _isBalanceVisible ? Icons.visibility : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
                         onPressed: () => setState(() => _isBalanceVisible = !_isBalanceVisible),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -151,8 +163,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Baris Isi Saldo dan Logo QR
-                  // Baris Isi Saldo (full width) dan Logo QR
                   Row(
                     children: [
                       Expanded(
@@ -170,7 +180,14 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Icon(Icons.add_circle_outline, color: Color(0xFF0040A1), size: 24),
                                   SizedBox(width: 8),
-                                  Text('Isi Saldo', style: TextStyle(color: Color(0xFF0040A1), fontWeight: FontWeight.w500, fontSize: 16)),
+                                  Text(
+                                    'Isi Saldo',
+                                    style: TextStyle(
+                                      color: Color(0xFF0040A1),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -178,13 +195,16 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFE9800),
-                          borderRadius: BorderRadius.circular(12),
+                      GestureDetector(
+                        onTap: _goToQris,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFE9800),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 28),
                         ),
-                        child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 28),
                       ),
                     ],
                   ),
@@ -195,7 +215,6 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 16),
 
-          // ========== KONTEN LAINNYA (tidak berubah) ==========
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -203,12 +222,12 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [ 
-                    const Text(
+                  children: const [
+                    Text(
                       'Kebutuhan Utama',
                       style: TextStyle(fontSize: 24, color: Color(0xFF0040A1), fontWeight: FontWeight.w700),
                     ),
-                    const Text(
+                    Text(
                       'PUSAT KAMPUS',
                       style: TextStyle(fontSize: 12, color: Color(0xFF8A5100), fontWeight: FontWeight.w700),
                     ),
@@ -223,28 +242,37 @@ class _HomePageState extends State<HomePage> {
                   mainAxisSpacing: 16,
                   childAspectRatio: 1.2,
                   children: [
-                    _buildMenuCard(
-                      icon: Icons.qr_code_scanner,
-                      label: 'QRIS',
-                      subtitle: 'DAYAR INSTAN',
-                      bgColor: const Color(0xFFFFFFFF),
-                      iconBgColor: const Color(0xFF0040A1).withOpacity(0.1),
-                      iconColor: const Color(0xFF0040A1),
+                    GestureDetector(
+                      onTap: _goToQris,
+                      child: _buildMenuCard(
+                        icon: Icons.qr_code_scanner,
+                        label: 'QRIS',
+                        subtitle: 'BAYAR INSTAN',
+                        bgColor: Colors.white,
+                        iconBgColor: const Color(0xFF0040A1).withValues(alpha: 0.1),
+                        iconColor: const Color(0xFF0040A1),
+                      ),
                     ),
-                    _buildMenuCard(
-                      icon: Icons.swap_horiz,
-                      label: 'Transfer',
-                      subtitle: 'KIRIM DANA',
-                      bgColor: const Color(0xFFFFFFFF),
-                      iconBgColor: const Color(0xFF8A51001A).withOpacity(0.1),
-                      iconColor: const Color(0xFF8A5100),
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TransferPage()),
+                      ).then((_) => setState(() {})),
+                      child: _buildMenuCard(
+                        icon: Icons.swap_horiz,
+                        label: 'Transfer',
+                        subtitle: 'KIRIM DANA',
+                        bgColor: Colors.white,
+                        iconBgColor: const Color(0xFF8A5100).withValues(alpha: 0.1),
+                        iconColor: const Color(0xFF8A5100),
+                      ),
                     ),
                     _buildMenuCard(
                       icon: Icons.account_balance_wallet,
                       label: 'E-wallet',
                       subtitle: 'TOP UP APLIKASI',
-                      bgColor: const Color(0xFFFFFFFF),
-                      iconBgColor: const Color(0xFFA938021A).withOpacity(0.1),
+                      bgColor: Colors.white,
+                      iconBgColor: const Color(0xFFA93802).withValues(alpha: 0.1),
                       iconColor: const Color(0xFFA93802),
                     ),
                     _buildMenuCard(
@@ -252,53 +280,51 @@ class _HomePageState extends State<HomePage> {
                       label: 'Campus Pay',
                       subtitle: 'BAYA & ACARA',
                       bgColor: const Color(0xFFFFDCBD),
-                      iconBgColor: const Color(0xFFFFFFFF),
+                      iconBgColor: Colors.white,
                       iconColor: const Color(0xFF8A5100),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
 
-                // Pintasan Cepat
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Pintasan Cepat',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Color(0xFF0040A1)),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'LIHAT SEMUA',
-                      style: TextStyle(color: Color(0xFF737785), fontWeight: FontWeight.w700),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Pintasan Cepat',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Color(0xFF0040A1)),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 3,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.0, // membuat item berbentuk kotak
-                children: [
-                  _buildQuickAccessGridItem('Pulsa & Data', Icons.flash_on),
-                  _buildQuickAccessGridItem('Kantin Perpus', Icons.coffee),
-                  _buildQuickAccessGridItem('Sewa Kos', Icons.house),
-                ],
-              ),
-              const SizedBox(height: 24),
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        'LIHAT SEMUA',
+                        style: TextStyle(color: Color(0xFF737785), fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1.0,
+                  children: [
+                    _buildQuickAccessGridItem('Pulsa & Data', Icons.flash_on),
+                    _buildQuickAccessGridItem('Kantin Perpus', Icons.coffee),
+                    _buildQuickAccessGridItem('Sewa Kos', Icons.house),
+                  ],
+                ),
+                const SizedBox(height: 24),
 
-                // Jurnal Transaksi
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
                       'Jurnal Transaksi',
-                      style: TextStyle(fontSize: 24,color: Color(0xFF0040A1), fontWeight: FontWeight.w700),
+                      style: TextStyle(fontSize: 24, color: Color(0xFF0040A1), fontWeight: FontWeight.w700),
                     ),
                     TextButton(
                       onPressed: () {},
@@ -357,19 +383,16 @@ class _HomePageState extends State<HomePage> {
         currentIndex: 0,
         onTap: (index) {
           if (index == 1) {
-            // Navigasi ke halaman Transfer
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const TransferPage()),
-            );
+            ).then((_) => setState(() {}));
           } else if (index == 2) {
-            // Navigasi ke halaman Riwayat
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const RiwayatPage()),
-            );
+            ).then((_) => setState(() {}));
           } else if (index == 3) {
-            // Navigasi ke halaman Pengaturan
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const SettingsPage()),
@@ -380,7 +403,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Widget pembantu (sama seperti sebelumnya)
   Widget _buildMenuCard({
     required IconData icon,
     required String label,
@@ -416,23 +438,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildQuickAccess(String title, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: const Color(0xFF0040A1)),
-          const SizedBox(width: 8),
-          Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-        ],
-      ),
-    );
-  }
   Widget _buildTransactionItem({
     required String title,
     required String titleSpan,
@@ -442,29 +447,30 @@ class _HomePageState extends State<HomePage> {
     required IconData icon,
     required String category,
   }) {
-    // Warna kategori
-    Map<String, Color> categoryTextColor = {
+    final Map<String, Color> categoryTextColor = {
       'MAKANAN': const Color(0xFF693C00),
       'UANG SAKU': const Color(0xFF0040A1),
       'BELANJA': const Color(0xFF424654),
     };
-    Color textColor = categoryTextColor[category] ?? Colors.grey;
-    Color bgColor = textColor.withOpacity(0.15);
+    final textColor = categoryTextColor[category] ?? Colors.grey;
+    final bgColor = textColor.withValues(alpha: 0.15);
 
-    // Warna amount (+ hijau, - merah)
     Color amountColor = Colors.black87;
-    if (amount.contains('+')) amountColor = Colors.green;
-    else if (amount.contains('-')) amountColor = Colors.red;
+    if (amount.contains('+')) {
+      amountColor = Colors.green;
+    } else if (amount.contains('-')) {
+      amountColor = Colors.red;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFFFF),
-          borderRadius: BorderRadius.circular(20), // <-- rounded corner
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.05),
+              color: Colors.grey.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

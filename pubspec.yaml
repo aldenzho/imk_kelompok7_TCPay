@@ -32,6 +32,8 @@ dependencies:
     sdk: flutter
   local_auth: ^2.1.6
   dotted_border: ^2.0.0
+  mobile_scanner: ^5.2.3
+  qr_flutter: ^4.1.0
 
 
   # The following adds the Cupertino Icons font to your application.

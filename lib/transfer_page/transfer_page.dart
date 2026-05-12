@@ -1,18 +1,24 @@
 // lib/transfer_page.dart
 import 'package:flutter/material.dart';
+import 'package:dotted_border/dotted_border.dart';
 import '/homepage/homepage.dart';
 import '/riwayat_page/riwayat_page.dart';
 import '/settings_page/settings_page.dart';
-import 'package:dotted_border/dotted_border.dart';
+import 'tcpay_transfer/tcpay_search_screen.dart';
+import 'withdrawal/withdrawal_select_bank.dart';
 
-
-class TransferPage extends StatelessWidget {
+class TransferPage extends StatefulWidget {
   const TransferPage({super.key});
 
   @override
+  State<TransferPage> createState() => _TransferPageState();
+}
+
+class _TransferPageState extends State<TransferPage> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFBF9F8),
+      backgroundColor: const Color(0xFFFBF9F8),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
@@ -28,7 +34,10 @@ class TransferPage extends StatelessWidget {
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Color(0xFF0040A1)),
+            icon: const Icon(
+              Icons.notifications_none,
+              color: Color(0xFF0040A1),
+            ),
             onPressed: () {},
           ),
         ],
@@ -37,7 +46,7 @@ class TransferPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
           const Text(
-            'Pindahkan Dana Anda.',
+            'Pindahkan Dana Anda',
             style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
@@ -63,31 +72,47 @@ class TransferPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // GRID DUA KOLOM (antar-bank & sesama bank) - layout ikon di atas, rata kiri
+          // GRID DUA KOLOM (antar-bank & sesama bank)
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _buildTransferOption(
-                  icon: Icons.account_balance,
-                  title: 'Antar-bank',
-                  subtitle: 'Ke bank mana saja',
-                  bgColor: Colors.white,
-                  iconBgColor: const Color(0xFF0040A1).withOpacity(0.1),
-                  iconColor: const Color(0xFF0040A1),
-                  textColor: Colors.black,
+                child: GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const WithdrawalSelectBankScreen(),
+                    ),
+                  ).then((_) => setState(() {})),
+                  child: _buildTransferOption(
+                    icon: Icons.account_balance,
+                    title: 'Tarik Ke Bank',
+                    subtitle: 'Ke bank mana saja',
+                    bgColor: Colors.white,
+                    iconBgColor: const Color(0xFF0040A1).withValues(alpha: 0.1),
+                    iconColor: const Color(0xFF0040A1),
+                    textColor: Colors.black,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildTransferOption(
-                  icon: Icons.people,
-                  title: 'Sesama Bank',
-                  subtitle: 'Gratis & instan',
-                  bgColor: const Color(0xFF0040A1),
-                  iconBgColor: Colors.white.withOpacity(0.2),
-                  iconColor: Colors.white,
-                  textColor: Colors.white,
+                child: GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const TcPaySearchScreen(),
+                    ),
+                  ).then((_) => setState(() {})),
+                  child: _buildTransferOption(
+                    icon: Icons.people,
+                    title: 'Sesama TC Pay',
+                    subtitle: 'Gratis & instan',
+                    bgColor: const Color(0xFF0040A1),
+                    iconBgColor: Colors.white.withValues(alpha: 0.2),
+                    iconColor: Colors.white,
+                    textColor: Colors.white,
+                  ),
                 ),
               ),
             ],
@@ -100,7 +125,7 @@ class TransferPage extends StatelessWidget {
             title: 'UKT & Biaya Kampus',
             subtitle: 'Bayar kuliah dengan NRP',
             bgColor: const Color(0xFFFE9800),
-            iconBgColor: const Color(0xFF643900).withOpacity(0.1),
+            iconBgColor: const Color(0xFF643900).withValues(alpha: 0.1),
             iconColor: const Color(0xFF643900),
             labelText: 'Kampus Ready',
             labelBgColor: const Color(0xFF643900),
@@ -117,7 +142,10 @@ class TransferPage extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {},
-                child: const Text('Lihat Semua', style: TextStyle(color: Color(0xFF0040A1))),
+                child: const Text(
+                  'Lihat Semua',
+                  style: TextStyle(color: Color(0xFF0040A1)),
+                ),
               ),
             ],
           ),
@@ -156,14 +184,20 @@ class TransferPage extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         'Pembayaran Anda sebesar Rp 1.250.000 ke "Tojo Buku Universitas" telah terkirim.',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade700,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 TextButton(
                   onPressed: () {},
-                  child: const Text('Detail', style: TextStyle(color: Color(0xFF0040A1))),
+                  child: const Text(
+                    'Detail',
+                    style: TextStyle(color: Color(0xFF0040A1)),
+                  ),
                 ),
               ],
             ),
@@ -176,8 +210,24 @@ class TransferPage extends StatelessWidget {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
-          _buildRecentTransfer('AZM', 'Aiden Zhorif Muhammad', 'BANK TC + 4492'),
-          _buildRecentTransfer('RA', 'Rusdi Anto', 'BRH + 8011'),
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TcPaySearchScreen()),
+            ).then((_) => setState(() {})),
+            child: _buildRecentTransfer(
+              'AZM',
+              'Aiden Zhorif Muhammad',
+              'BANK TC + 4492',
+            ),
+          ),
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TcPaySearchScreen()),
+            ).then((_) => setState(() {})),
+            child: _buildRecentTransfer('RA', 'Rusdi Anto', 'BRH + 8011'),
+          ),
           const SizedBox(height: 80),
         ],
       ),
@@ -188,9 +238,15 @@ class TransferPage extends StatelessWidget {
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'BERANDA'),
-          BottomNavigationBarItem(icon: Icon(Icons.swap_horiz), label: 'TRANSFER'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.swap_horiz),
+            label: 'TRANSFER',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'RIWAYAT'),
-          BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'SETTINGS'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'SETTINGS',
+          ),
         ],
         currentIndex: 1,
         onTap: (index) {
@@ -215,7 +271,6 @@ class TransferPage extends StatelessWidget {
     );
   }
 
-  // Layout vertikal: icon di atas, teks di bawah, rata kiri (start)
   Widget _buildTransferOption({
     required IconData icon,
     required String title,
@@ -230,11 +285,13 @@ class TransferPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(16),
-        border: bgColor == Colors.white ? Border.all(color: Colors.grey.shade200) : null,
+        border: bgColor == Colors.white
+            ? Border.all(color: Colors.grey.shade200)
+            : null,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Rata kiri
-        mainAxisAlignment: MainAxisAlignment.start,   // Mulai dari atas
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             width: 52,
@@ -248,21 +305,25 @@ class TransferPage extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: textColor),
-            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: textColor,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(fontSize: 10, color: textColor.withOpacity(0.7)),
-            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontSize: 10,
+              color: textColor.withValues(alpha: 0.7),
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Full width UKT & Biaya Kampus (tanpa panah, icon di kanan)
   Widget _buildFullWidthTransferOption({
     required IconData icon,
     required String title,
@@ -289,9 +350,22 @@ class TransferPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white70,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -318,7 +392,11 @@ class TransferPage extends StatelessWidget {
             ),
             child: Text(
               labelText,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
@@ -326,14 +404,18 @@ class TransferPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEwalletItem(String assetPath, String label, {bool isAddButton = false}) {
+  Widget _buildEwalletItem(
+    String assetPath,
+    String label, {
+    bool isAddButton = false,
+  }) {
     if (isAddButton) {
       return Column(
         children: [
           DottedBorder(
             color: Colors.grey.shade400,
             strokeWidth: 1.5,
-            dashPattern: [6, 4],
+            dashPattern: const [6, 4],
             borderType: BorderType.RRect,
             radius: const Radius.circular(16),
             child: Container(
@@ -345,7 +427,11 @@ class TransferPage extends StatelessWidget {
               child: const Center(
                 child: Text(
                   '+',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w300, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
             ),
@@ -371,14 +457,16 @@ class TransferPage extends StatelessWidget {
                 fit: BoxFit.contain,
                 width: 50,
                 height: 50,
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
-                    child: Text(
-                      label[0],
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0040A1)),
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Text(
+                    label[0],
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0040A1),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ),
           ),
@@ -389,17 +477,16 @@ class TransferPage extends StatelessWidget {
     }
   }
 
-
   Widget _buildRecentTransfer(String initial, String name, String accountInfo) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFFFF), // putih
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.05),
+              color: Colors.grey.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -412,16 +499,25 @@ class TransferPage extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: Colors.grey.shade200,
-                child: Text(initial, style: const TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(
+                  initial,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(height: 2),
-                    Text(accountInfo, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    Text(
+                      accountInfo,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                   ],
                 ),
               ),
