@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '/shared/thousands_formatter.dart';
-import '/services/wallet_service.dart';
+import 'va_bank_screen.dart';
+import 'transfer_manual_screen.dart';
+import 'minimarket_screen.dart';
 
 class IsiSaldoScreen extends StatefulWidget {
   const IsiSaldoScreen({super.key});
@@ -25,8 +27,6 @@ class _IsiSaldoScreenState extends State<IsiSaldoScreen> {
 
   bool _useCustom = false;
   bool _isLoading = false;
-
-  final WalletService _walletService = WalletService();
 
   @override
   void dispose() {
@@ -56,59 +56,31 @@ class _IsiSaldoScreenState extends State<IsiSaldoScreen> {
     return buf.toString();
   }
 
-  Future<void> _proceed(BuildContext context, String method) async {
+  void _proceed(BuildContext context, String method) {
     final amount = _finalAmount;
 
     if (amount < 10000) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Minimal top up Rp 10.000'),
-        ),
+        const SnackBar(content: Text('Minimal top up Rp 10.000')),
       );
       return;
     }
 
-    String methodName = 'Isi Saldo';
-
     if (method == 'va') {
-      methodName = 'Virtual Account';
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => VaBankScreen(amount: amount)),
+      );
     } else if (method == 'manual') {
-      methodName = 'Transfer Bank Manual';
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => TransferManualScreen(amount: amount)),
+      );
     } else if (method == 'minimarket') {
-      methodName = 'Minimarket';
-    }
-
-    setState(() => _isLoading = true);
-
-    try {
-      await _walletService.topUpBalance(
-        amount: amount,
-        method: methodName,
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => MinimarketScreen(amount: amount)),
       );
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Isi saldo berhasil: ${_formatRp(amount)}'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal isi saldo: $e'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
     }
   }
 

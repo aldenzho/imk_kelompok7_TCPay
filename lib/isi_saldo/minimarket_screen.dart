@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '/state/app_state.dart';
-import '/models/transaction_model.dart';
+import '/services/wallet_service.dart';
 
 class MinimarketScreen extends StatefulWidget {
   final int amount;
@@ -40,26 +39,27 @@ class _MinimarketScreenState extends State<MinimarketScreen> {
     setState(() => _isConfirming = true);
     await Future.delayed(const Duration(milliseconds: 1500));
     if (!mounted) return;
-    final now = DateTime.now();
-    AppState.instance.balance += widget.amount;
-    AppState.instance.addTransaction(TransactionModel(
-      id: 'TOP-${now.millisecondsSinceEpoch}',
-      title: 'Top Up via ${_stores[_selectedStore].name}',
-      subtitle: 'HARI INI, ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} • TOP UP',
-      amount: widget.amount.toDouble(),
-      isDebit: false,
-      dateTime: now,
-      type: TransactionType.transferIn,
-    ));
-    setState(() => _isConfirming = false);
-    if (!mounted) return;
-    Navigator.popUntil(context, (route) => route.isFirst);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Top up ${_formatRp(widget.amount)} berhasil! Saldo telah bertambah.'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    try {
+      await WalletService().topUpBalance(
+        amount: widget.amount,
+        method: _stores[_selectedStore].name,
+      );
+      if (!mounted) return;
+      Navigator.popUntil(context, (route) => route.isFirst);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Top up ${_formatRp(widget.amount)} berhasil! Saldo telah bertambah.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _isConfirming = false);
+    }
   }
 
   String _expiryTime() {

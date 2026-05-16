@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '/models/tcpay_contact.dart';
-import '/state/app_state.dart';
 import '/shared/thousands_formatter.dart';
 import 'tcpay_review_screen.dart';
 
@@ -17,8 +18,32 @@ class _TcPayAmountScreenState extends State<TcPayAmountScreen> {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
   String? _errorText;
+  double _balance = 0;
 
   static const List<int> _quickAmounts = [50000, 100000, 250000, 500000];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBalance();
+  }
+
+  Future<void> _fetchBalance() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final snap = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    if (mounted) setState(() => _balance = (snap.data()?['balance'] ?? 0).toDouble());
+  }
+
+  String _formatRp(double val) {
+    final str = val.toInt().toString();
+    final buf = StringBuffer('Rp ');
+    for (int i = 0; i < str.length; i++) {
+      if (i > 0 && (str.length - i) % 3 == 0) buf.write('.');
+      buf.write(str[i]);
+    }
+    return buf.toString();
+  }
 
   @override
   void dispose() {
@@ -47,7 +72,7 @@ class _TcPayAmountScreenState extends State<TcPayAmountScreen> {
       setState(() => _errorText = 'Masukkan nominal yang valid');
       return;
     }
-    if (amount > AppState.instance.balance) {
+    if (amount > _balance) {
       setState(() => _errorText = 'Saldo tidak mencukupi');
       return;
     }
@@ -168,7 +193,7 @@ class _TcPayAmountScreenState extends State<TcPayAmountScreen> {
                 ],
                 const SizedBox(height: 8),
                 Text(
-                  'Saldo: ${AppState.instance.formattedBalance}',
+                  'Saldo: ${_formatRp(_balance)}',
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const SizedBox(height: 16),

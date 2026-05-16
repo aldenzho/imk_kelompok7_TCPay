@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '/models/bank_account_model.dart';
-import '/state/app_state.dart';
 import '/shared/thousands_formatter.dart';
 import 'withdrawal_review_screen.dart';
 
@@ -16,8 +17,32 @@ class WithdrawalAmountScreen extends StatefulWidget {
 class _WithdrawalAmountScreenState extends State<WithdrawalAmountScreen> {
   final _amountController = TextEditingController();
   String? _errorText;
+  double _balance = 0;
 
   static const double _adminFee = 6500;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBalance();
+  }
+
+  Future<void> _fetchBalance() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final snap = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    if (mounted) setState(() => _balance = (snap.data()?['balance'] ?? 0).toDouble());
+  }
+
+  String _formatRpDouble(double val) {
+    final str = val.toInt().toString();
+    final buf = StringBuffer('Rp ');
+    for (int i = 0; i < str.length; i++) {
+      if (i > 0 && (str.length - i) % 3 == 0) buf.write('.');
+      buf.write(str[i]);
+    }
+    return buf.toString();
+  }
   static const List<int> _quickAmounts = [100000, 250000, 500000, 1000000];
 
   @override
@@ -56,7 +81,7 @@ class _WithdrawalAmountScreenState extends State<WithdrawalAmountScreen> {
       setState(() => _errorText = 'Minimal penarikan Rp 50.000');
       return;
     }
-    if (amount + _adminFee > AppState.instance.balance) {
+    if (amount + _adminFee > _balance) {
       setState(() => _errorText = 'Saldo tidak mencukupi (termasuk biaya admin)');
       return;
     }
@@ -182,7 +207,7 @@ class _WithdrawalAmountScreenState extends State<WithdrawalAmountScreen> {
                 ],
                 const SizedBox(height: 6),
                 Text(
-                  'Saldo: ${AppState.instance.formattedBalance} • Min. Rp 50.000',
+                  'Saldo: ${_formatRpDouble(_balance)} • Min. Rp 50.000',
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const SizedBox(height: 14),

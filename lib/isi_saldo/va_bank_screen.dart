@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '/state/app_state.dart';
-import '/models/transaction_model.dart';
+import '/services/wallet_service.dart';
 
 class VaBankScreen extends StatefulWidget {
   final int amount;
@@ -53,25 +52,26 @@ class _VaBankScreenState extends State<VaBankScreen> {
     });
   }
 
-  void _simulateTopUp() {
-    final now = DateTime.now();
-    AppState.instance.balance += widget.amount;
-    AppState.instance.addTransaction(TransactionModel(
-      id: 'TOP-${now.millisecondsSinceEpoch}',
-      title: 'Top Up via VA ${_selected!.shortName}',
-      subtitle: 'HARI INI, ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} • TOP UP',
-      amount: widget.amount.toDouble(),
-      isDebit: false,
-      dateTime: now,
-      type: TransactionType.transferIn,
-    ));
-    Navigator.popUntil(context, (route) => route.isFirst);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Top up ${_formatRp(widget.amount)} berhasil! Saldo telah bertambah.'),
-        backgroundColor: Colors.green,
-      ),
-    );
+  Future<void> _simulateTopUp() async {
+    try {
+      await WalletService().topUpBalance(
+        amount: widget.amount,
+        method: 'VA ${_selected!.shortName}',
+      );
+      if (!mounted) return;
+      Navigator.popUntil(context, (route) => route.isFirst);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Top up ${_formatRp(widget.amount)} berhasil! Saldo telah bertambah.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
