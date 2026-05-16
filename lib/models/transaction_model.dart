@@ -1,5 +1,10 @@
-enum TransactionType { transferOut, transferIn, withdrawal, qrisPayment }
-
+enum TransactionType {
+  transferOut,
+  transferIn,
+  withdrawal,
+  qrisPayment,
+  topUp,
+}
 class TransactionModel {
   final String id;
   final String title;

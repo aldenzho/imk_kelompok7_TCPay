@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "25633711790",
+    "project_id": "tcpay-93a38",
+    "storage_bucket": "tcpay-93a38.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:25633711790:android:72a7872af039ec76a2af3f",
+        "android_client_info": {
+          "package_name": "com.example.flutter_imk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkMPG9LwIAD--wiVbxaoX0uGBEDw227PA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
