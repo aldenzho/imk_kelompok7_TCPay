@@ -1,6 +1,7 @@
 // lib/transfer_page.dart
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '/homepage/homepage.dart';
 import '/riwayat_page/riwayat_page.dart';
 import '/settings_page/settings_page.dart';
@@ -16,19 +17,37 @@ class TransferPage extends StatefulWidget {
 }
 
 class _TransferPageState extends State<TransferPage> {
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _showComingSoon(String fitur) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$fitur segera hadir')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final userName = user?.displayName ?? user?.email ?? 'Pengguna TCPay';
+
     return Scaffold(
       backgroundColor: const Color(0xFFFBF9F8),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text(
-          'Abimanyu Danendra A.',
-          style: TextStyle(
+        title: Text(
+          userName,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Color(0xFF0040A1),
           ),
+          overflow: TextOverflow.ellipsis,
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -39,7 +58,7 @@ class _TransferPageState extends State<TransferPage> {
               Icons.notifications_none,
               color: Color(0xFF0040A1),
             ),
-            onPressed: () {},
+            onPressed: () => _showComingSoon('Notifikasi'),
           ),
         ],
       ),
@@ -63,11 +82,25 @@ class _TransferPageState extends State<TransferPage> {
               borderRadius: BorderRadius.circular(30),
             ),
             child: TextField(
-              decoration: InputDecoration(
+              controller: _searchController,
+              onChanged: (value) {
+                if (value.trim().isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TcPaySearchScreen(initialQuery: value),
+                    ),
+                  ).then((_) {
+                    _searchController.clear();
+                    setState(() {});
+                  });
+                }
+              },
+              decoration: const InputDecoration(
                 hintText: 'Cari kontak atau layanan',
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                prefixIcon: Icon(Icons.search, color: Colors.grey),
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 14),
               ),
             ),
           ),
@@ -149,7 +182,7 @@ class _TransferPageState extends State<TransferPage> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () => _showComingSoon('Top up e-wallet'),
                 child: const Text(
                   'Lihat Semua',
                   style: TextStyle(color: Color(0xFF0040A1)),
@@ -161,10 +194,22 @@ class _TransferPageState extends State<TransferPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildEwalletItem('assets/gopay.png', 'GoPay'),
-              _buildEwalletItem('assets/ovo.png', 'OVO'),
-              _buildEwalletItem('assets/shopeepay.png', 'ShopeePay'),
-              _buildEwalletItem('', 'Lainnya', isAddButton: true),
+              GestureDetector(
+                onTap: () => _showComingSoon('Top up GoPay'),
+                child: _buildEwalletItem('assets/gopay.png', 'GoPay'),
+              ),
+              GestureDetector(
+                onTap: () => _showComingSoon('Top up OVO'),
+                child: _buildEwalletItem('assets/ovo.png', 'OVO'),
+              ),
+              GestureDetector(
+                onTap: () => _showComingSoon('Top up ShopeePay'),
+                child: _buildEwalletItem('assets/shopeepay.png', 'ShopeePay'),
+              ),
+              GestureDetector(
+                onTap: () => _showComingSoon('Top up e-wallet lainnya'),
+                child: _buildEwalletItem('', 'Lainnya', isAddButton: true),
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -201,7 +246,10 @@ class _TransferPageState extends State<TransferPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RiwayatPage()),
+                  ),
                   child: const Text(
                     'Detail',
                     style: TextStyle(color: Color(0xFF0040A1)),

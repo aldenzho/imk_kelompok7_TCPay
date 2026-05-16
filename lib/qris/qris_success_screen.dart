@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '/models/transaction_model.dart';
-import '/state/app_state.dart';
+import '/services/wallet_service.dart';
 import '/shared/transaction_receipt_screen.dart';
 
 class QrisSuccessScreen extends StatefulWidget {
@@ -22,27 +21,28 @@ class QrisSuccessScreen extends StatefulWidget {
 }
 
 class _QrisSuccessScreenState extends State<QrisSuccessScreen> {
+  bool _isLoading = true;
+  String? _error;
+
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    AppState.instance.deductBalance(widget.amount);
-    AppState.instance.addTransaction(TransactionModel(
-      id: 'QRIS-${now.millisecondsSinceEpoch}',
-      title: widget.merchantName,
-      subtitle: '${_timeLabel(now)} • QRIS',
-      amount: widget.amount,
-      isDebit: true,
-      dateTime: now,
-      type: TransactionType.qrisPayment,
-      note: widget.note.isEmpty ? null : widget.note,
-    ));
+    _processPayment();
   }
 
-  String _timeLabel(DateTime dt) {
-    final h = dt.hour.toString().padLeft(2, '0');
-    final m = dt.minute.toString().padLeft(2, '0');
-    return 'HARI INI, $h:$m';
+  Future<void> _processPayment() async {
+    try {
+      await WalletService().qrisPayment(
+        amount: widget.amount,
+        merchantName: widget.merchantName,
+        merchantId: widget.merchantId,
+        note: widget.note,
+      );
+    } catch (e) {
+      setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   String _formatRp(double val) {
@@ -57,6 +57,40 @@ class _QrisSuccessScreenState extends State<QrisSuccessScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null) {
+      return Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                const Text(
+                  'Pembayaran Gagal',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey)),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                  child: const Text('Kembali ke Beranda'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final now = DateTime.now();
     final refId = 'QRIS${now.millisecondsSinceEpoch}';
     final tanggal =

@@ -28,12 +28,15 @@ class AuthServices {
 
     await user.updateDisplayName(name.trim());
 
+    final tcpayId = 'TCP${user.uid.substring(user.uid.length - 8).toUpperCase()}';
+
     await _firestore.collection('users').doc(user.uid).set({
       'uid': user.uid,
       'name': name.trim(),
       'username': username.trim(),
       'email': email.trim(),
       'balance': 0,
+      'tcpayId': tcpayId,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });

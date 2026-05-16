@@ -1,8 +1,70 @@
 // lib/campus_pay/campus_pay.dart
 import 'package:flutter/material.dart';
+import '/services/wallet_service.dart';
 
-class CampusPayPage extends StatelessWidget {
+class CampusPayPage extends StatefulWidget {
   const CampusPayPage({super.key});
+
+  @override
+  State<CampusPayPage> createState() => _CampusPayPageState();
+}
+
+class _CampusPayPageState extends State<CampusPayPage> {
+  bool _isPaying = false;
+
+  Future<void> _bayarSekarang() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Konfirmasi Pembayaran'),
+        content: const Text(
+          'Bayar UKT Semester Ganjil 2023/2024 sebesar Rp 7.500.000?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0040A1)),
+            child: const Text('Bayar', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _isPaying = true);
+    try {
+      await WalletService().campusPayment(
+        amount: 7500000,
+        semester: 'Ganjil 2023/2024',
+        description: 'Tagihan UKT Semester Ganjil 2023/2024',
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pembayaran UKT berhasil!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isPaying = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,21 +155,22 @@ class CampusPayPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: ElevatedButton(
-                        onPressed: () {
-                          // Aksi bayar
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Fitur pembayaran segera hadir')),
-                          );
-                        },
+                        onPressed: _isPaying ? null : _bayarSekarang,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                         ),
-                        child: const Text(
-                          'Bayar Sekarang',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 255, 255)),
-                        ),
+                        child: _isPaying
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              )
+                            : const Text(
+                                'Bayar Sekarang',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
                       ),
                     ),
                   ),

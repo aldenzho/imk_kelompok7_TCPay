@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '/models/tcpay_contact.dart';
 import '/shared/pin_confirmation_screen.dart';
@@ -14,6 +15,13 @@ class TcPayReviewScreen extends StatelessWidget {
     required this.amount,
     required this.note,
   });
+
+  String _getInitials(String name) {
+    final parts = name.trim().split(' ').where((p) => p.isNotEmpty).toList();
+    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    if (parts.isNotEmpty) return parts[0][0].toUpperCase();
+    return 'U';
+  }
 
   String _formatRp(double val) {
     final str = val.toInt().toString();
@@ -89,9 +97,9 @@ class TcPayReviewScreen extends StatelessWidget {
                       // Sender
                       _buildPartyRow(
                         label: 'Dari',
-                        name: 'Abimanyu Danendra A.',
-                        detail: 'Akun TCPay ****8821',
-                        initials: 'AD',
+                        name: FirebaseAuth.instance.currentUser?.displayName ?? 'Pengguna TCPay',
+                        detail: 'Akun TCPay Saya',
+                        initials: _getInitials(FirebaseAuth.instance.currentUser?.displayName ?? 'U'),
                         isBlue: false,
                       ),
                       Padding(

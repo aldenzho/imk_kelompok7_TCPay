@@ -3,7 +3,8 @@ import '/models/tcpay_contact.dart';
 import 'tcpay_amount_screen.dart';
 
 class TcPaySearchScreen extends StatefulWidget {
-  const TcPaySearchScreen({super.key});
+  final String initialQuery;
+  const TcPaySearchScreen({super.key, this.initialQuery = ''});
 
   @override
   State<TcPaySearchScreen> createState() => _TcPaySearchScreenState();
@@ -12,6 +13,15 @@ class TcPaySearchScreen extends StatefulWidget {
 class _TcPaySearchScreenState extends State<TcPaySearchScreen> {
   final _searchController = TextEditingController();
   List<TcPayContact> _filtered = TcPayContact.mockContacts;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialQuery.isNotEmpty) {
+      _searchController.text = widget.initialQuery;
+      _onSearch(widget.initialQuery);
+    }
+  }
 
   @override
   void dispose() {

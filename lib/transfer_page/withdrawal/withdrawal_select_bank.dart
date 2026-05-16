@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '/models/bank_account_model.dart';
@@ -39,7 +40,7 @@ class _WithdrawalSelectBankScreenState extends State<WithdrawalSelectBankScreen>
     setState(() {
       _isVerifying = false;
       _isVerified = true;
-      _accountHolderController.text = 'Abimanyu Danendra A.';
+      _accountHolderController.text = FirebaseAuth.instance.currentUser?.displayName ?? 'Nama Pemilik';
     });
   }
 

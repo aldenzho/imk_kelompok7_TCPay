@@ -6,10 +6,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '/transfer_page/transfer_page.dart';
+import '/transfer_page/campus_pay/campus_pay.dart';
 import '/riwayat_page/riwayat_page.dart';
 import '/settings_page/settings_page.dart';
 import '/qris/qris_menu_screen.dart';
 import '/isi_saldo/isi_saldo_screen.dart';
+import '/pintasan_cepat/pintasan_cepat_screen.dart';
+import '/pintasan_cepat/semua_pintasan_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -157,6 +160,7 @@ class _HomePageState extends State<HomePage> {
                     color: Color(0xFF0040A1),
                   ),
                   overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 16),
                 GridView.count(
                   shrinkWrap: true,
@@ -191,19 +195,25 @@ class _HomePageState extends State<HomePage> {
                         iconColor: const Color(0xFF8A5100),
                       ),
                     ),
-                    _buildMenuCard(
-                      icon: Icons.account_balance_wallet,
-                      label: 'E-wallet',
-                      subtitle: 'TOP UP APLIKASI',
-                      bgColor: Colors.white,
-                      iconBgColor: const Color(0xFFA93802).withValues(alpha: 0.1),
-                      iconColor: const Color(0xFFA93802),
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const IsiSaldoScreen()),
+                      ),
+                      child: _buildMenuCard(
+                        icon: Icons.account_balance_wallet,
+                        label: 'E-wallet',
+                        subtitle: 'TOP UP APLIKASI',
+                        bgColor: Colors.white,
+                        iconBgColor: const Color(0xFFA93802).withValues(alpha: 0.1),
+                        iconColor: const Color(0xFFA93802),
+                      ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const TransferPage()),
-                      ).then((_) => setState(() {})),
+                        MaterialPageRoute(builder: (_) => const CampusPayPage()),
+                      ),
                       child: _buildMenuCard(
                         icon: Icons.school,
                         label: 'Campus Pay',
@@ -496,22 +506,34 @@ class _HomePageState extends State<HomePage> {
                             iconColor: const Color(0xFF8A5100),
                           ),
                         ),
-                        _buildMenuCard(
-                          icon: Icons.account_balance_wallet,
-                          label: 'E-wallet',
-                          subtitle: 'TOP UP APLIKASI',
-                          bgColor: Colors.white,
-                          iconBgColor:
-                              const Color(0xFFA93802).withOpacity(0.1),
-                          iconColor: const Color(0xFFA93802),
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const IsiSaldoScreen()),
+                          ),
+                          child: _buildMenuCard(
+                            icon: Icons.account_balance_wallet,
+                            label: 'E-wallet',
+                            subtitle: 'TOP UP APLIKASI',
+                            bgColor: Colors.white,
+                            iconBgColor:
+                                const Color(0xFFA93802).withOpacity(0.1),
+                            iconColor: const Color(0xFFA93802),
+                          ),
                         ),
-                        _buildMenuCard(
-                          icon: Icons.school,
-                          label: 'Campus Pay',
-                          subtitle: 'BAYA & ACARA',
-                          bgColor: const Color(0xFFFFDCBD),
-                          iconBgColor: Colors.white,
-                          iconColor: const Color(0xFF8A5100),
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const CampusPayPage()),
+                          ),
+                          child: _buildMenuCard(
+                            icon: Icons.school,
+                            label: 'Campus Pay',
+                            subtitle: 'BAYA & ACARA',
+                            bgColor: const Color(0xFFFFDCBD),
+                            iconBgColor: Colors.white,
+                            iconColor: const Color(0xFF8A5100),
+                          ),
                         ),
                       ],
                     ),
@@ -530,7 +552,14 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const SemuaPintasanScreen(),
+                              ),
+                            );
+                          },
                           child: const Text(
                             'LIHAT SEMUA',
                             style: TextStyle(
@@ -552,17 +581,66 @@ class _HomePageState extends State<HomePage> {
                       mainAxisSpacing: 12,
                       childAspectRatio: 1.0,
                       children: [
-                        _buildQuickAccessGridItem(
-                          'Pulsa & Data',
-                          Icons.flash_on,
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PintasanCepatScreen(
+                                title: 'Pulsa & Data',
+                                icon: Icons.flash_on,
+                                color: Color(0xFF0040A1),
+                                paymentType: 'pulsaData',
+                                items: [
+                                  PintasanCepatItem(label: 'Pulsa 10.000', amount: 11000, description: 'Pulsa reguler semua operator'),
+                                  PintasanCepatItem(label: 'Pulsa 25.000', amount: 26500, description: 'Pulsa reguler semua operator'),
+                                  PintasanCepatItem(label: 'Pulsa 50.000', amount: 52000, description: 'Pulsa reguler semua operator'),
+                                  PintasanCepatItem(label: 'Data 1GB/7 hari', amount: 15000, description: 'Paket data internet'),
+                                  PintasanCepatItem(label: 'Data 5GB/30 hari', amount: 45000, description: 'Paket data internet'),
+                                ],
+                              ),
+                            ),
+                          ),
+                          child: _buildQuickAccessGridItem('Pulsa & Data', Icons.flash_on),
                         ),
-                        _buildQuickAccessGridItem(
-                          'Kantin Perpus',
-                          Icons.coffee,
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PintasanCepatScreen(
+                                title: 'Kantin Perpus',
+                                icon: Icons.coffee,
+                                color: Color(0xFF8A5100),
+                                paymentType: 'kantinPerpus',
+                                items: [
+                                  PintasanCepatItem(label: 'Paket Makan Siang', amount: 15000, description: 'Nasi + lauk + minuman'),
+                                  PintasanCepatItem(label: 'Minuman & Snack', amount: 8000, description: 'Minuman dan camilan'),
+                                  PintasanCepatItem(label: 'Kopi & Roti', amount: 12000, description: 'Kopi + roti bakar'),
+                                  PintasanCepatItem(label: 'Paket Sarapan', amount: 10000, description: 'Bubur/nasi uduk + minuman'),
+                                ],
+                              ),
+                            ),
+                          ),
+                          child: _buildQuickAccessGridItem('Kantin Perpus', Icons.coffee),
                         ),
-                        _buildQuickAccessGridItem(
-                          'Sewa Kos',
-                          Icons.house,
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PintasanCepatScreen(
+                                title: 'Sewa Kos',
+                                icon: Icons.house,
+                                color: Color(0xFF2E7D32),
+                                paymentType: 'sewaKos',
+                                items: [
+                                  PintasanCepatItem(label: 'Kos Bulanan Tipe A', amount: 500000, description: 'Kamar standar tanpa AC'),
+                                  PintasanCepatItem(label: 'Kos Bulanan Tipe B', amount: 750000, description: 'Kamar dengan AC'),
+                                  PintasanCepatItem(label: 'Kos Bulanan Tipe C', amount: 1000000, description: 'Kamar AC + kamar mandi dalam'),
+                                  PintasanCepatItem(label: 'Perpanjang 3 Bulan', amount: 2100000, description: 'Paket 3 bulan hemat 10%'),
+                                ],
+                              ),
+                            ),
+                          ),
+                          child: _buildQuickAccessGridItem('Sewa Kos', Icons.house),
                         ),
                       ],
                     ),

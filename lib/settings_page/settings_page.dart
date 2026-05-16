@@ -8,14 +8,28 @@ import '/transfer_page/transfer_page.dart';
 import '/riwayat_page/riwayat_page.dart';
 import '/auth/security_choice_page.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool _privacyMode = false;
+  bool _biometricLogin = true;
 
   void _goToSecurityChoice(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => SecurityChoicePage()),
       (route) => false,
+    );
+  }
+
+  void _showComingSoon(String fitur) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$fitur segera hadir')),
     );
   }
 
@@ -90,7 +104,7 @@ class SettingsPage extends StatelessWidget {
                   Icons.notifications_none,
                   color: Color(0xFF0040A1),
                 ),
-                onPressed: () {},
+                onPressed: () => _showComingSoon('Notifikasi'),
               ),
             ],
           ),
@@ -181,56 +195,6 @@ class SettingsPage extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  'PRIVACY & SECURITY',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _buildSettingsTile(
-                title: 'Privacy Mode',
-                subtitle: 'Mask balances by default',
-                icon: Icons.visibility_off,
-                trailing: Switch(
-                  value: false,
-                  onChanged: (v) {},
-                  activeThumbColor: const Color(0xFF0040A1),
-                  activeTrackColor: const Color(0xFF0040A1).withOpacity(0.5),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _buildSettingsTile(
-                title: 'Biometric Login',
-                subtitle: 'Use FaceID or Fingerprint',
-                icon: Icons.fingerprint,
-                trailing: Switch(
-                  value: true,
-                  onChanged: (v) {},
-                  activeThumbColor: const Color(0xFF0040A1),
-                  activeTrackColor: const Color(0xFF0040A1).withOpacity(0.5),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _buildSettingsTile(
-                title: 'Two-Factor Auth',
-                subtitle: 'Enhanced account protection',
-                icon: Icons.security,
-                trailing: Switch(
-                  value: false,
-                  onChanged: (v) {},
-                  activeThumbColor: const Color(0xFF0040A1),
-                  activeTrackColor: const Color(0xFF0040A1).withOpacity(0.5),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Section PRIVASI & KEAMANAN (Indonesian)
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
                   'PRIVASI & KEAMANAN',
                   style: TextStyle(
                     fontSize: 14,
@@ -241,12 +205,12 @@ class SettingsPage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               _buildSettingsTile(
-                title: 'Autentikasi Dua Faktor',
-                subtitle: 'Peningkatan perlindungan akun',
-                icon: Icons.security,
+                title: 'Privacy Mode',
+                subtitle: 'Sembunyikan saldo secara default',
+                icon: Icons.visibility_off,
                 trailing: Switch(
-                  value: false,
-                  onChanged: (v) {},
+                  value: _privacyMode,
+                  onChanged: (v) => setState(() => _privacyMode = v),
                   activeThumbColor: const Color(0xFF0040A1),
                   activeTrackColor: const Color(0xFF0040A1).withOpacity(0.5),
                 ),
@@ -257,12 +221,26 @@ class SettingsPage extends StatelessWidget {
                 subtitle: 'Gunakan FaceID atau Sidik Jari',
                 icon: Icons.fingerprint,
                 trailing: Switch(
-                  value: true,
-                  onChanged: (v) {},
+                  value: _biometricLogin,
+                  onChanged: (v) => setState(() => _biometricLogin = v),
                   activeThumbColor: const Color(0xFF0040A1),
                   activeTrackColor: const Color(0xFF0040A1).withOpacity(0.5),
                 ),
               ),
+              const SizedBox(height: 12),
+              _buildSettingsTile(
+                title: 'Autentikasi Dua Faktor',
+                subtitle: 'Peningkatan perlindungan akun',
+                icon: Icons.security,
+                trailing: Switch(
+                  value: false,
+                  onChanged: (v) => _showComingSoon('Autentikasi Dua Faktor'),
+                  activeThumbColor: const Color(0xFF0040A1),
+                  activeTrackColor: const Color(0xFF0040A1).withOpacity(0.5),
+                ),
+              ),
+              const SizedBox(height: 24),
+
               const SizedBox(height: 32),
 
               // Tombol Keluar (background merah oval panjang, icon logout di kiri)
