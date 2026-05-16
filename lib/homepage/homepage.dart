@@ -157,63 +157,6 @@ class _HomePageState extends State<HomePage> {
                     color: Color(0xFF0040A1),
                   ),
                   overflow: TextOverflow.ellipsis,
-                const SizedBox(height: 16),
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.2,
-                  children: [
-                    GestureDetector(
-                      onTap: _goToQris,
-                      child: _buildMenuCard(
-                        icon: Icons.qr_code_scanner,
-                        label: 'QRIS',
-                        subtitle: 'BAYAR INSTAN',
-                        bgColor: Colors.white,
-                        iconBgColor: const Color(0xFF0040A1).withValues(alpha: 0.1),
-                        iconColor: const Color(0xFF0040A1),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const TransferPage()),
-                      ).then((_) => setState(() {})),
-                      child: _buildMenuCard(
-                        icon: Icons.swap_horiz,
-                        label: 'Transfer',
-                        subtitle: 'KIRIM DANA',
-                        bgColor: Colors.white,
-                        iconBgColor: const Color(0xFF8A5100).withValues(alpha: 0.1),
-                        iconColor: const Color(0xFF8A5100),
-                      ),
-                    ),
-                    _buildMenuCard(
-                      icon: Icons.account_balance_wallet,
-                      label: 'E-wallet',
-                      subtitle: 'TOP UP APLIKASI',
-                      bgColor: Colors.white,
-                      iconBgColor: const Color(0xFFA93802).withValues(alpha: 0.1),
-                      iconColor: const Color(0xFFA93802),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const TransferPage()),
-                      ).then((_) => setState(() {})),
-                      child: _buildMenuCard(
-                        icon: Icons.school,
-                        label: 'Campus Pay',
-                        subtitle: 'BAYA & ACARA',
-                        bgColor: const Color(0xFFFFDCBD),
-                        iconBgColor: Colors.white,
-                        iconColor: const Color(0xFF8A5100),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
