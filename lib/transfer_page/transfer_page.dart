@@ -6,6 +6,7 @@ import '/riwayat_page/riwayat_page.dart';
 import '/settings_page/settings_page.dart';
 import 'tcpay_transfer/tcpay_search_screen.dart';
 import 'withdrawal/withdrawal_select_bank.dart';
+import './campus_pay/campus_pay.dart';
 
 class TransferPage extends StatefulWidget {
   const TransferPage({super.key});
@@ -120,17 +121,24 @@ class _TransferPageState extends State<TransferPage> {
           const SizedBox(height: 16),
 
           // UKT & Biaya Kampus full width
-          _buildFullWidthTransferOption(
-            icon: Icons.school,
-            title: 'UKT & Biaya Kampus',
-            subtitle: 'Bayar kuliah dengan NRP',
-            bgColor: const Color(0xFFFE9800),
-            iconBgColor: const Color(0xFF643900).withValues(alpha: 0.1),
-            iconColor: const Color(0xFF643900),
-            labelText: 'Kampus Ready',
-            labelBgColor: const Color(0xFF643900),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CampusPayPage()),
+              );
+            },
+            child: _buildFullWidthTransferOption(
+              icon: Icons.school,
+              title: 'UKT & Biaya Kampus',
+              subtitle: 'Bayar kuliah dengan NRP',
+              bgColor: const Color(0xFFFE9800),
+              iconBgColor: const Color(0xFF643900).withOpacity(0.1),
+              iconColor: const Color(0xFF643900),
+              labelText: 'Kampus Ready',
+              labelBgColor: const Color(0xFF643900),
+            ),
           ),
-          const SizedBox(height: 24),
 
           // Top up E-wallet
           Row(
